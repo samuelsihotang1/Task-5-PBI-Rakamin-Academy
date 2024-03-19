@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"belajar-go/initializers"
+	"belajar-go/database"
 	"belajar-go/models"
 	"net/http"
 	"os"
@@ -41,7 +41,7 @@ func SignUp(c *gin.Context) {
 
 	// Create the user
 	user := models.User{Email: body.Email, Password: string(hash)}
-	result := initializers.DB.Create(&user)
+	result := database.DB.Create(&user)
 
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -90,7 +90,7 @@ func Login(c *gin.Context) {
 
 	// Search for the requested user
 	var user models.User
-	initializers.DB.First(&user, "email = ?", body.Email)
+	database.DB.First(&user, "email = ?", body.Email)
 
 	if user.ID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{

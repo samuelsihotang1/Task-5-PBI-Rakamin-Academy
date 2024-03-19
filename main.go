@@ -1,28 +1,21 @@
 package main
 
 import (
-	"belajar-go/controllers"
-	"belajar-go/initializers"
-	"belajar-go/middleware"
+	"belajar-go/database"
+	"belajar-go/helpers"
+	"belajar-go/router"
 
 	"github.com/gin-gonic/gin"
 )
 
 func init() {
-	initializers.LoadEnvVariables()
-	initializers.ConnectToDb()
-	initializers.SyncDatabase()
+	helpers.LoadEnvVariables()
+	database.Connect()
+	database.Migration()
 }
 
 func main() {
 	r := gin.Default()
-	r.GET("/register", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "ping",
-		})
-	})
-	r.POST("/register", controllers.SignUp)
-	r.POST("/login", controllers.Login)
-	r.GET("/validate", middleware.RequireAuth, controllers.Validate)
+	router.Routers(r)
 	r.Run()
 }

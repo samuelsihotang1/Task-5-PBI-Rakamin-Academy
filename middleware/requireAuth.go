@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"belajar-go/initializers"
+	"belajar-go/database"
 	"belajar-go/models"
 	"fmt"
 	"log"
@@ -43,7 +43,7 @@ func RequireAuth(c *gin.Context) {
 
 		// Find the user with that id
 		var user models.User
-		initializers.DB.First(&user, claims["sub"])
+		database.DB.First(&user, claims["sub"])
 
 		if user.ID == 0 {
 			c.AbortWithStatus(http.StatusUnauthorized)

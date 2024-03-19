@@ -1,4 +1,4 @@
-package initializers
+package database
 
 import (
 	"os"
@@ -9,7 +9,7 @@ import (
 
 var DB *gorm.DB
 
-func ConnectToDb() {
+func Connect() {
 	var err error
 
 	DB, err = gorm.Open(mysql.Open(os.Getenv("DB")), &gorm.Config{})
