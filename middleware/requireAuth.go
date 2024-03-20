@@ -4,7 +4,6 @@ import (
 	"belajar-go/database"
 	"belajar-go/models"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"time"
@@ -18,7 +17,9 @@ func RequireAuth(c *gin.Context) {
 	tokenString, err := c.Cookie("Authorization")
 
 	if err != nil {
-		c.AbortWithStatus(http.StatusUnauthorized)
+		c.Redirect(http.StatusFound, "/login")
+		c.Abort()
+		// c.AbortWithStatus(http.StatusUnauthorized)
 	}
 
 	// Decode/Validate it
@@ -32,13 +33,17 @@ func RequireAuth(c *gin.Context) {
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		c.Redirect(http.StatusFound, "/login")
+		c.Abort()
+		// log.Fatal(err)
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok {
 		// Check the expiration
 		if float64(time.Now().Unix()) > claims["exp"].(float64) {
-			c.AbortWithStatus(http.StatusUnauthorized)
+			c.Redirect(http.StatusFound, "/login")
+			c.Abort()
+			// c.AbortWithStatus(http.StatusUnauthorized)
 		}
 
 		// Find the user with that id
@@ -46,7 +51,9 @@ func RequireAuth(c *gin.Context) {
 		database.DB.First(&user, claims["sub"])
 
 		if user.ID == 0 {
-			c.AbortWithStatus(http.StatusUnauthorized)
+			c.Redirect(http.StatusFound, "/login")
+			c.Abort()
+			// c.AbortWithStatus(http.StatusUnauthorized)
 		}
 
 		// Attach to request
@@ -55,6 +62,9 @@ func RequireAuth(c *gin.Context) {
 		// Continue
 		c.Next()
 	} else {
-		c.AbortWithStatus(http.StatusUnauthorized)
+		// Memaksa untuk mengakses route /login
+		c.Redirect(http.StatusFound, "/login")
+		c.Abort()
+		// c.AbortWithStatus(http.StatusUnauthorized)
 	}
 }
