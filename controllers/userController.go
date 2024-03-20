@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -28,6 +29,9 @@ func SignUp(c *gin.Context) {
 
 	// Validate request
 	if !helpers.MyValidateStruct(c, body) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed to validate body",
+		})
 		return
 	}
 
@@ -74,6 +78,7 @@ func SignUp(c *gin.Context) {
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", false, true)
 	c.JSON(http.StatusOK, gin.H{})
+	c.Redirect(http.StatusFound, "/")
 }
 
 func Login(c *gin.Context) {
@@ -90,6 +95,9 @@ func Login(c *gin.Context) {
 
 	// Validate request
 	if !helpers.MyValidateStruct(c, body) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed to validate body",
+		})
 		return
 	}
 
@@ -97,7 +105,7 @@ func Login(c *gin.Context) {
 	var user models.User
 	database.DB.First(&user, "email = ?", body.Email)
 
-	if user.ID == 0 {
+	if user.ID == uuid.Nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid email or password",
 		})
@@ -134,13 +142,122 @@ func Login(c *gin.Context) {
 	// Respond
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", false, true)
-	c.JSON(http.StatusOK, gin.H{})
+	c.Redirect(http.StatusFound, "/")
 }
 
-func Validate(c *gin.Context) {
+func GetUserInfo(c *gin.Context) {
 	user, _ := c.Get("user")
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": user,
+		"user": user,
 	})
+}
+
+func EditUsers(c *gin.Context) {
+	// Get request body
+	body := app.UserRegister{}
+
+	if c.Bind(&body) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed to read body",
+		})
+
+		return
+	}
+
+	// Validate request
+	if !helpers.MyValidateStruct(c, body) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed to validate body",
+		})
+		return
+	}
+
+	// get user id
+	userID := c.Param("userId")
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "User ID is required",
+		})
+		return
+	}
+
+	// Search for the requested user
+	var user models.User
+	database.DB.First(&user, "id = ?", userID)
+
+	if user.ID == uuid.Nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Account not found",
+		})
+
+		return
+	}
+
+	// Hash the password
+	hash, err := bcrypt.GenerateFromPassword([]byte(body.Password), 10)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed to hash password",
+		})
+
+		return
+	}
+
+	// Update user
+	user.Username = body.Username
+	user.Email = body.Email
+	user.Password = string(hash)
+
+	// Save the updated user to the database
+	if err := database.DB.Save(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to update user",
+		})
+		return
+	}
+
+	// Respond with success message or updated user details
+	c.JSON(http.StatusOK, gin.H{
+		"message": "User updated successfully",
+		"user":    user,
+	})
+}
+
+func Logout(c *gin.Context) {
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("Authorization", "", -1, "", "", false, true)
+
+	c.Redirect(http.StatusFound, "/")
+}
+
+func DeleteUser(c *gin.Context) {
+	// get user id
+	userID := c.Param("userId")
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "User ID is required",
+		})
+		return
+	}
+
+	// Search for the requested user
+	var user models.User
+	if err := database.DB.First(&user, "id = ?", userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "User not found",
+		})
+		return
+	}
+
+	// Delete the user
+	if err := database.DB.Delete(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to delete user",
+		})
+		return
+	}
+
+	c.Redirect(http.StatusFound, "/login")
 }
