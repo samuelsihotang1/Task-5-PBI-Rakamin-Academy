@@ -18,7 +18,7 @@ func RequireAuth(c *gin.Context) {
 
 	if err != nil {
 		c.Redirect(http.StatusFound, "/login")
-		c.Abort()
+		return
 		// c.AbortWithStatus(http.StatusUnauthorized)
 	}
 
@@ -34,7 +34,7 @@ func RequireAuth(c *gin.Context) {
 
 	if err != nil {
 		c.Redirect(http.StatusFound, "/login")
-		c.Abort()
+		return
 		// log.Fatal(err)
 	}
 
@@ -42,7 +42,7 @@ func RequireAuth(c *gin.Context) {
 		// Check the expiration
 		if float64(time.Now().Unix()) > claims["exp"].(float64) {
 			c.Redirect(http.StatusFound, "/login")
-			c.Abort()
+			return
 			// c.AbortWithStatus(http.StatusUnauthorized)
 		}
 
@@ -52,7 +52,7 @@ func RequireAuth(c *gin.Context) {
 
 		if user.ID == 0 {
 			c.Redirect(http.StatusFound, "/login")
-			c.Abort()
+			return
 			// c.AbortWithStatus(http.StatusUnauthorized)
 		}
 
@@ -64,7 +64,7 @@ func RequireAuth(c *gin.Context) {
 	} else {
 		// Memaksa untuk mengakses route /login
 		c.Redirect(http.StatusFound, "/login")
-		c.Abort()
+		return
 		// c.AbortWithStatus(http.StatusUnauthorized)
 	}
 }
