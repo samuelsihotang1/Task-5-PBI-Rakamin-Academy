@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>Edit Akun</title>
+	</head>
+	<body>
+		<h1>Edit Akun Anda</h1>
+
+		<form id="editForm" enctype="multipart/form-data">
+			Username:
+			<input
+				placeholder="Masukkan Username"
+				id="Username"
+				type="text"
+				name="Username"
+				value="" /><br />
+			Email:
+			<input
+				placeholder="Masukkan Email"
+				id="Email"
+				type="email"
+				name="Email"
+				value="" /><br />
+			Password:
+			<input
+				placeholder="Masukkan Password"
+				id="Password"
+				type="password"
+				name="Password"
+				value="" /><br />
+			<input type="submit" value="Edit" />
+		</form>
+
+		<h3 id="message"></h3>
+
+		<br />
+		<a href="/">Kembali</a>
+
+		<br />
+
+		<br />
+		<form action="/users/logout" method="post">
+			<input type="submit" value="Logout" />
+		</form>
+
+		<br />
+		<br />
+
+		<form id="deleteUser">
+			<input type="submit" value="Hapus Akun Anda" />
+		</form>
+
+		<script>
+			function loadUserData() {
+				fetch('/users/info')
+					.then((response) => response.json())
+					.then((data) => {
+						console.log(data);
+						document.getElementById('Username').value = data.user.Username;
+						document.getElementById('Email').value = data.user.Email;
+						document.getElementById('editForm').action =
+							'/users/' + data.user.ID;
+						document
+							.getElementById('editForm')
+							.addEventListener('submit', submitForm);
+						document.getElementById('deleteUser').action =
+							'/users/' + data.user.ID;
+						document
+							.getElementById('deleteUser')
+							.addEventListener('submit', deleteUser);
+					})
+					.catch((error) => {
+						console.error('Error:', error);
+					});
+			}
+
+			function submitForm(event) {
+				event.preventDefault();
+				var formData = new FormData(event.target);
+				var data = {};
+				formData.forEach((value, key) => {
+					data[key] = value;
+				});
+				fetch(event.target.action, {
+					method: 'PUT',
+					body: JSON.stringify(data),
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				})
+					.then((response) => response.json())
+					.then((data) => {
+						if (data.message) {
+							document.getElementById('message').innerText = data.message;
+						} else if (data.error) {
+							document.getElementById('message').innerText = data.error;
+						}
+					})
+					.catch((error) => {
+						document.getElementById('message').innerText = data.error;
+					});
+			}
+
+			function deleteUser(event) {
+				event.preventDefault();
+				fetch(event.target.action, {
+					method: 'DELETE',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				}).then(() => {
+					setTimeout(() => {
+						window.location.href = '/users/login';
+					}, 1500);
+				});
+			}
+
+			window.onload = loadUserData;
+		</script>
+	</body>
+</html>

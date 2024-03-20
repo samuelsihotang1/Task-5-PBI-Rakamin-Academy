@@ -17,7 +17,7 @@ func RequireAuth(c *gin.Context) {
 	tokenString, err := c.Cookie("Authorization")
 
 	if err != nil {
-		c.Redirect(http.StatusFound, "/login")
+		c.Redirect(http.StatusFound, "/users/login")
 		return
 		// c.AbortWithStatus(http.StatusUnauthorized)
 	}
@@ -33,7 +33,7 @@ func RequireAuth(c *gin.Context) {
 	})
 
 	if err != nil {
-		c.Redirect(http.StatusFound, "/login")
+		c.Redirect(http.StatusFound, "/users/login")
 		return
 		// log.Fatal(err)
 	}
@@ -41,19 +41,23 @@ func RequireAuth(c *gin.Context) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok {
 		// Check the expiration
 		if float64(time.Now().Unix()) > claims["exp"].(float64) {
-			c.Redirect(http.StatusFound, "/login")
+			c.Redirect(http.StatusFound, "/users/login")
 			return
 			// c.AbortWithStatus(http.StatusUnauthorized)
 		}
 
 		// Find the user with that id
 		var user models.User
-		database.DB.First(&user, claims["sub"])
+		resultSearch := database.DB.First(&user, claims["sub"])
 
-		if user.ID == 0 {
-			c.Redirect(http.StatusFound, "/login")
+		if resultSearch.RowsAffected == 0 {
+			c.Redirect(http.StatusFound, "/users/login")
 			return
-			// c.AbortWithStatus(http.StatusUnauthorized)
+		}
+
+		if resultSearch.Error != nil {
+			c.Redirect(http.StatusFound, "/users/login")
+			return
 		}
 
 		// Attach to request
@@ -62,8 +66,8 @@ func RequireAuth(c *gin.Context) {
 		// Continue
 		c.Next()
 	} else {
-		// Memaksa untuk mengakses route /login
-		c.Redirect(http.StatusFound, "/login")
+		// Memaksa untuk mengakses route /users/login
+		c.Redirect(http.StatusFound, "/users/login")
 		return
 		// c.AbortWithStatus(http.StatusUnauthorized)
 	}

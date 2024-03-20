@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/google/uuid"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -77,7 +76,6 @@ func SignUp(c *gin.Context) {
 	// Respond
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", false, true)
-	c.JSON(http.StatusOK, gin.H{})
 	c.Redirect(http.StatusFound, "/")
 }
 
@@ -103,13 +101,19 @@ func Login(c *gin.Context) {
 
 	// Search for the requested user
 	var user models.User
-	database.DB.First(&user, "email = ?", body.Email)
+	resultSearch := database.DB.First(&user, "email = ?", body.Email)
 
-	if user.ID == uuid.Nil {
+	if resultSearch.RowsAffected == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid email or password",
+			"error": "User not found",
 		})
+		return
+	}
 
+	if resultSearch.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Database error",
+		})
 		return
 	}
 
@@ -184,13 +188,19 @@ func EditUsers(c *gin.Context) {
 
 	// Search for the requested user
 	var user models.User
-	database.DB.First(&user, "id = ?", userID)
+	resultSearch := database.DB.First(&user, "email = ?", body.Email)
 
-	if user.ID == uuid.Nil {
+	if resultSearch.RowsAffected == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Account not found",
+			"error": "User not found",
 		})
+		return
+	}
 
+	if resultSearch.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Database error",
+		})
 		return
 	}
 
@@ -259,5 +269,7 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(http.StatusFound, "/login")
+	c.JSON(http.StatusOK, gin.H{
+		"message": "User deleted successfully",
+	})
 }
