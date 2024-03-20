@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"belajar-go/app"
 	"belajar-go/database"
+	"belajar-go/helpers"
 	"belajar-go/models"
 	"net/http"
 	"os"
@@ -14,17 +16,18 @@ import (
 )
 
 func SignUp(c *gin.Context) {
-	// Get the email/password off request body
-	var body struct {
-		Email    string
-		Password string
-	}
+	// Get request body
+	body := app.UserRegister{}
 
 	if c.Bind(&body) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Failed to read body",
 		})
+		return
+	}
 
+	// Validate request
+	if !helpers.MyValidateStruct(c, body) {
 		return
 	}
 
@@ -40,7 +43,7 @@ func SignUp(c *gin.Context) {
 	}
 
 	// Create the user
-	user := models.User{Email: body.Email, Password: string(hash)}
+	user := models.User{Username: body.Username, Email: body.Email, Password: string(hash)}
 	result := database.DB.Create(&user)
 
 	if result.Error != nil {
@@ -74,17 +77,19 @@ func SignUp(c *gin.Context) {
 }
 
 func Login(c *gin.Context) {
-	// Get the email/password off request body
-	var body struct {
-		Email    string
-		Password string
-	}
+	// Get request body
+	body := app.UserLogin{}
 
 	if c.Bind(&body) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Failed to read body",
 		})
 
+		return
+	}
+
+	// Validate request
+	if !helpers.MyValidateStruct(c, body) {
 		return
 	}
 
