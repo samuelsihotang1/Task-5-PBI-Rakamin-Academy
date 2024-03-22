@@ -56,7 +56,6 @@
 				fetch('/users/info')
 					.then((response) => response.json())
 					.then((data) => {
-						console.log(data);
 						document.getElementById('Username').value = data.user.Username;
 						document.getElementById('Email').value = data.user.Email;
 						document.getElementById('editForm').action =
