@@ -150,7 +150,13 @@ func Login(c *gin.Context) {
 }
 
 func GetUserInfo(c *gin.Context) {
-	user, _ := c.Get("user")
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to get user information",
+		})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"user": user,
