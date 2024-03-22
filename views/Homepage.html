@@ -7,15 +7,21 @@
 	<body>
 		<h1>Upload Photo</h1>
 
-		<form action="/upload" method="post" enctype="multipart/form-data">
+		<!-- Photos -->
+		<form action="/photos" method="post" enctype="multipart/form-data">
+			Title: <input placeholder="Masukkan Judul" type="text" name="Title" /><br />
+			Caption:
+			<input placeholder="Masukkan Keterangan" type="text" name="Caption" /><br />
 			Files: <input type="file" name="file" /><br /><br />
 			<input type="submit" value="Submit" />
 		</form>
 
+		<!-- Edit Account -->
 		<br />
 		<a href="/users">Edit Akun</a>
 		<br />
 
+		<!-- Logout -->
 		<br />
 		<form action="/users/logout" method="post">
 			<input type="submit" value="Logout" />

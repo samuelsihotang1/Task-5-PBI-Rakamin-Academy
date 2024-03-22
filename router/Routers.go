@@ -15,8 +15,8 @@ func Routers(r *gin.Engine) {
 	})
 
 	// Login
-	r.POST("/login", controllers.Login)
-	r.GET("/users/login", func(c *gin.Context) {
+	r.POST("/users/login", controllers.Login)
+	r.GET("/login", func(c *gin.Context) {
 		c.File("./views/Login.html")
 	})
 
@@ -31,6 +31,7 @@ func Routers(r *gin.Engine) {
 			c.File("./views/Homepage.html")
 		})
 
+		// User Things
 		/////////////////////////////////////////////////////
 		// Get User Info
 		m.GET("/users/info", controllers.GetUserInfo)
@@ -47,5 +48,12 @@ func Routers(r *gin.Engine) {
 		// Delete User
 		m.DELETE("/users/:userId", controllers.DeleteUser)
 		/////////////////////////////////////////////////////
+
+		// Photo Things
+		/////////////////////////////////////////////////////
+		// Add Photo
+		m.POST("/photos", controllers.PostPhoto)
+		/////////////////////////////////////////////////////
+
 	}
 }
