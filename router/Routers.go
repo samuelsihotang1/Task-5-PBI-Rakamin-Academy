@@ -53,6 +53,18 @@ func Routers(r *gin.Engine) {
 		/////////////////////////////////////////////////////
 		// Add Photo
 		m.POST("/photos", controllers.PostPhoto)
+
+		// Get Photo
+		m.GET("/photos", controllers.GetPhoto)
+
+		// Get InfoPhoto
+		m.GET("/infophoto", controllers.GetInfoPhoto)
+
+		// Edit Photo
+		m.PUT("/photos/:photoId", controllers.EditPhotos)
+
+		// Delete Photo
+		m.DELETE("/photos/:photoId", controllers.DeletePhoto)
 		/////////////////////////////////////////////////////
 
 	}

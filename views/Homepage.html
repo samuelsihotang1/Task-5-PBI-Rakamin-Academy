@@ -5,10 +5,9 @@
 		<title>Homepage</title>
 	</head>
 	<body>
-		<h1>Upload Photo</h1>
-
 		<!-- Photos -->
-		<form action="/photos" method="post" enctype="multipart/form-data">
+		<form id="photoForm" action="/photos" method="post" enctype="multipart/form-data">
+			<h1>Upload Photo</h1>
 			Title: <input placeholder="Masukkan Judul" type="text" name="Title" /><br />
 			Caption:
 			<input placeholder="Masukkan Keterangan" type="text" name="Caption" /><br />
@@ -16,7 +15,31 @@
 			<input type="submit" value="Submit" />
 		</form>
 
+		<!-- Edit Photos -->
+		<form id="editPhotoForm" enctype="multipart/form-data" action="/potos/3">
+			<h2>Edit Photos</h2>
+			Title:
+			<input
+				id="Title"
+				value=""
+				placeholder="Masukkan Judul"
+				type="text"
+				name="Title" /><br />
+			Caption:
+			<input
+				id="Caption"
+				value=""
+				placeholder="Masukkan Keterangan"
+				type="text"
+				name="Caption" /><br />
+			Files: <input type="file" name="file" /><br /><br />
+			<input type="submit" value="Edit Photo" />
+		</form>
+		<button id="DeletePhotoForm">Delete Photos</button>
+		<div id="imagesContainer"></div>
+
 		<!-- Edit Account -->
+		<br />
 		<br />
 		<a href="/users">Edit Akun</a>
 		<br />
@@ -26,5 +49,117 @@
 		<form action="/users/logout" method="post">
 			<input type="submit" value="Logout" />
 		</form>
+
+		<script>
+			const photoFormContainer = document.getElementById('photoForm');
+			const editPhotoFormContainer = document.getElementById('editPhotoForm');
+			const deletePhotoFormContainer = document.getElementById('DeletePhotoForm');
+			const imagesContainer = document.getElementById('imagesContainer');
+
+			function toggleDisplay(hasPhoto) {
+				if (hasPhoto) {
+					photoFormContainer.style.display = 'none';
+					editPhotoFormContainer.style.display = 'block';
+					deletePhotoFormContainer.style.display = 'block';
+					imagesContainer.style.display = 'block';
+				} else {
+					photoFormContainer.style.display = 'block';
+					editPhotoFormContainer.style.display = 'none';
+					deletePhotoFormContainer.style.display = 'none';
+					imagesContainer.style.display = 'none';
+				}
+			}
+
+			window.onload = function () {
+				loadPhotoData();
+
+				fetch('/photos')
+					.then((response) => {
+						if (response.ok) {
+							return response.blob();
+						} else {
+							toggleDisplay(false);
+							throw new Error('No photo found for the current user');
+						}
+					})
+					.then((blob) => {
+						toggleDisplay(true);
+						const imageURL = URL.createObjectURL(blob);
+						const img = document.createElement('img');
+						img.src = imageURL;
+						img.width = 500;
+						imagesContainer.appendChild(img);
+					})
+					.catch((error) => {
+						console.error('Error:', error);
+					});
+
+				document
+					.getElementById('editPhotoForm')
+					.addEventListener('submit', function (event) {
+						event.preventDefault();
+
+						var form = event.target;
+						var formData = new FormData(form);
+
+						fetch(form.action, {
+							method: 'PUT',
+							body: formData,
+						})
+							.then((response) => {
+								if (!response.ok) {
+									throw new Error('Network response was not ok');
+								}
+								return response.json();
+							})
+							.then((data) => {
+								console.log('Success:', data);
+							})
+							.catch((error) => {
+								console.error('Error:', error);
+							});
+						setTimeout(() => {
+							window.location.reload();
+						}, 1500);
+					});
+			};
+
+			function loadPhotoData() {
+				fetch('/infophoto')
+					.then((response) => response.json())
+					.then((data) => {
+						document.getElementById('Title').value = data.photo.Title;
+						document.getElementById('Caption').value = data.photo.Caption;
+						document.getElementById('editPhotoForm').action =
+							'/photos/' + data.photo.ID;
+						document
+							.getElementById('DeletePhotoForm')
+							.addEventListener('click', function () {
+								fetch('/photos/' + data.photo.ID, {
+									method: 'DELETE',
+									headers: {
+										'Content-Type': 'application/json',
+									},
+								})
+									.then((response) => {
+										if (response.ok) {
+											console.log('Photo deleted successfully.');
+											setTimeout(() => {
+												window.location.reload();
+											}, 1500);
+										} else {
+											console.error('Failed to delete photo.');
+										}
+									})
+									.catch((error) => {
+										console.error('Error deleting photo:', error);
+									});
+							});
+					})
+					.catch((error) => {
+						console.error('Error:', error);
+					});
+			}
+		</script>
 	</body>
 </html>

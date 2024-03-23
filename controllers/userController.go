@@ -76,7 +76,7 @@ func SignUp(c *gin.Context) {
 	// Respond
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", false, true)
-	c.Redirect(http.StatusFound, "/")
+	// c.Redirect(http.StatusFound, "/")
 }
 
 func Login(c *gin.Context) {
@@ -146,7 +146,7 @@ func Login(c *gin.Context) {
 	// Respond
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", false, true)
-	c.Redirect(http.StatusFound, "/")
+	// c.Redirect(http.StatusFound, "/")
 }
 
 func GetUserInfo(c *gin.Context) {
@@ -194,7 +194,7 @@ func EditUsers(c *gin.Context) {
 
 	// Search for the requested user
 	var user models.User
-	resultSearch := database.DB.First(&user, "email = ?", body.Email)
+	resultSearch := database.DB.First(&user, "id = ?", userID)
 
 	if resultSearch.RowsAffected == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -249,7 +249,6 @@ func Logout(c *gin.Context) {
 }
 
 func DeleteUser(c *gin.Context) {
-	// get user id
 	userID := c.Param("userId")
 	if userID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -258,7 +257,6 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 
-	// Search for the requested user
 	var user models.User
 	if err := database.DB.First(&user, "id = ?", userID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
@@ -267,7 +265,6 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 
-	// Delete the user
 	if err := database.DB.Delete(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to delete user",
