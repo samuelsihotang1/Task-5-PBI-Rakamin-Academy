@@ -1,11 +1,11 @@
 package middleware
 
 import (
-	"belajar-go/database"
-	"belajar-go/models"
 	"fmt"
 	"net/http"
 	"os"
+	"task-5-pbi-btpns-SamuelChristyAngieSihotang/database"
+	"task-5-pbi-btpns-SamuelChristyAngieSihotang/models"
 	"time"
 
 	"github.com/gin-gonic/gin"

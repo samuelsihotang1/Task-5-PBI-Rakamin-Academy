@@ -1,7 +1,7 @@
 package database
 
 import (
-	"belajar-go/models"
+	"task-5-pbi-btpns-SamuelChristyAngieSihotang/models"
 )
 
 func Migration() {

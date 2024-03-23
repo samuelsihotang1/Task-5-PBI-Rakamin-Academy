@@ -1,9 +1,9 @@
 package main
 
 import (
-	"belajar-go/database"
-	"belajar-go/helpers"
-	"belajar-go/router"
+	"task-5-pbi-btpns-SamuelChristyAngieSihotang/database"
+	"task-5-pbi-btpns-SamuelChristyAngieSihotang/helpers"
+	"task-5-pbi-btpns-SamuelChristyAngieSihotang/router"
 
 	"github.com/gin-gonic/gin"
 )

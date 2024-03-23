@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"belajar-go/app"
-	"belajar-go/database"
-	"belajar-go/helpers"
-	"belajar-go/models"
 	"net/http"
 	"os"
+	"task-5-pbi-btpns-SamuelChristyAngieSihotang/app"
+	"task-5-pbi-btpns-SamuelChristyAngieSihotang/database"
+	"task-5-pbi-btpns-SamuelChristyAngieSihotang/helpers"
+	"task-5-pbi-btpns-SamuelChristyAngieSihotang/models"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"

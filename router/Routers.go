@@ -1,8 +1,8 @@
 package router
 
 import (
-	"belajar-go/controllers"
-	"belajar-go/middleware"
+	"task-5-pbi-btpns-SamuelChristyAngieSihotang/controllers"
+	"task-5-pbi-btpns-SamuelChristyAngieSihotang/middleware"
 
 	"github.com/gin-gonic/gin"
 )

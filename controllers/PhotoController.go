@@ -1,14 +1,14 @@
 package controllers
 
 import (
-	"belajar-go/app"
-	"belajar-go/database"
-	"belajar-go/helpers"
-	"belajar-go/models"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
+	"task-5-pbi-btpns-SamuelChristyAngieSihotang/app"
+	"task-5-pbi-btpns-SamuelChristyAngieSihotang/database"
+	"task-5-pbi-btpns-SamuelChristyAngieSihotang/helpers"
+	"task-5-pbi-btpns-SamuelChristyAngieSihotang/models"
 	"time"
 
 	"github.com/gin-gonic/gin"

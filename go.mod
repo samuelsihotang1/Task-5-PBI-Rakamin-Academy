@@ -1,4 +1,4 @@
-module belajar-go
+module task-5-pbi-btpns-SamuelChristyAngieSihotang
 
 go 1.22.1
 
