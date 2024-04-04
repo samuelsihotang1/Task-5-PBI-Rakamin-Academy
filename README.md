@@ -1,9 +1,9 @@
 #### My Rakamin Profile : https://www.rakamin.com/profile/samuel-christy-angie-sihotang-e2mi2sqfttox765s
 
-# Task 5 PBI BTPNS - Web Application
+# Task 5 PBI - Web Application
 
 ## Overview
-This repository contains the source code for a web application developed for Task 5 PBI BTPNS project. The application serves as a platform where users can register, login, upload photos, edit their profiles, and perform other related tasks. Below is a breakdown of the main components and functionalities of the application:
+This repository contains the source code for a web application developed for Task 5 PBI project. The application serves as a platform where users can register, login, upload photos, edit their profiles, and perform other related tasks. Below is a breakdown of the main components and functionalities of the application:
 
 ### File Structure
 - **Connect.go:** Establishes a connection to the MySQL database.
